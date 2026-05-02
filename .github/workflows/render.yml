@@ -11,40 +11,20 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+          
 
-      - name: Cache Remotion browser binaries
-        uses: actions/cache@v4
+      - run: npm ci
+
+      - run: mkdir -p out
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
         with:
-          path: |
-            ~/.cache/remotion
-            ~/.cache/puppeteer
-          key: ${{ runner.os }}-remotion-browser-${{ hashFiles('remotion-iamazing/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-remotion-browser-
-
-      - name: Install dependencies
-        working-directory: remotion-iamazing
-        run: npm install
-
-      - name: Ensure output directory exists
-        working-directory: remotion-iamazing
-        run: mkdir -p out
-
-      - name: Render video
-        working-directory: remotion-iamazing
-        run: npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: iamazing-school-mp4
-          path: remotion-iamazing/out/iamazing-school.mp4
-          if-no-files-found: error
+          name: iamazing-school-video
+          path: out/iamazing-school.mp4
