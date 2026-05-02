@@ -1,8 +1,8 @@
-import {AbsoluteFill} from 'remotion';
+import {AbsoluteFill, Composition} from 'remotion';
 import {Bars} from './Bars';
 import {TextReveal} from './TextReveal';
 
-export const Main: React.FC = () => {
+const IamazingSchoolComposition: React.FC = () => {
   return (
     <AbsoluteFill style={{backgroundColor: '#ffffff'}}>
       <Bars />
@@ -10,3 +10,16 @@ export const Main: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+export default function Root() {
+  return (
+    <Composition
+      id="IamazingSchool"
+      component={IamazingSchoolComposition}
+      durationInFrames={600}
+      fps={30}
+      width={1920}
+      height={1080}
+    />
+  );
+}
