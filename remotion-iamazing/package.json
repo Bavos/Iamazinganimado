@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "remotion studio",
-    "build": "remotion render IamazingSchool out/iamazing-school.mp4"
+    "start": "remotion studio src/index.tsx",
+    "build": "remotion render src/index.tsx IamazingSchool out/iamazing-school.mp4"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.315",
