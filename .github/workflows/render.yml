@@ -1,22 +1,29 @@
-name: Remotion Render
+name: Render Video
 
 on:
-  workflow_dispatch:
   push:
-    branches: ["main"]
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     defaults:
       run:
         working-directory: remotion-iamazing
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -26,11 +33,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Render video
-        run: npm run render
+      - name: Create output folder
+        run: mkdir -p out
 
-      - name: Upload artifact
+      - name: Render MP4
+        run: npm run build
+
+      - name: Verify MP4 exists
+        run: |
+          ls -la out
+          test -f out/iamazing-school.mp4
+
+      - name: Upload MP4 for download
         uses: actions/upload-artifact@v4
         with:
-          name: iamazing-school-video
+          name: iamazing-school-mp4
           path: remotion-iamazing/out/iamazing-school.mp4
+          if-no-files-found: error
+          retention-days: 7
