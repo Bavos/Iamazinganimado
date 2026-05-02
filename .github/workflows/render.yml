@@ -18,8 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: remotion-iamazing/package-lock.json
+      
 
       - name: Cache Remotion browser binaries
         uses: actions/cache@v4
@@ -33,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: remotion-iamazing
-        run: npm ci
+        run: npm install
 
       - name: Ensure output directory exists
         working-directory: remotion-iamazing
