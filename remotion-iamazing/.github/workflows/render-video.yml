@@ -2,33 +2,41 @@ name: Render Remotion Video
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        working-directory: remotion-iamazing
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          
+          cache: npm
+          cache-dependency-path: remotion-iamazing/package-lock.json
 
       - name: Install dependencies
-        working-directory: remotion-iamazing
-        run: npm install
+        run: npm ci
 
-      - name: Render video
-        working-directory: remotion-iamazing
+      - name: Create output folder
+        run: mkdir -p out
+
+      - name: Render MP4
         run: npm run build
 
-      - name: Upload artifact
+      - name: Upload MP4 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: iamazing-school-mp4
+          name: iamazing-school-video
           path: remotion-iamazing/out/iamazing-school.mp4
