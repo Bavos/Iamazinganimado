@@ -1,0 +1,16 @@
+{
+  "name": "remotion-iamazing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render IamazingSchool out/iamazing-school.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.315",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.315",
+    "typescript": "^5.8.3"
+  }
+}
