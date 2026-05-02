@@ -1,7 +1,7 @@
 import {Composition} from 'remotion';
 import {Main} from './Composition';
 
-export const Root = () => {
+export const Root: React.FC = () => {
   return (
     <Composition
       id="IamazingSchool"

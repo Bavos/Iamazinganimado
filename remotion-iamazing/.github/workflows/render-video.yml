@@ -8,7 +8,6 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -18,25 +17,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      
-
-      - name: Cache Remotion browser binaries
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/remotion
-            ~/.cache/puppeteer
-          key: ${{ runner.os }}-remotion-browser-${{ hashFiles('remotion-iamazing/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-remotion-browser-
+          cache: npm
+          cache-dependency-path: remotion-iamazing/package-lock.json
 
       - name: Install dependencies
         working-directory: remotion-iamazing
         run: npm install
-
-      - name: Ensure output directory exists
-        working-directory: remotion-iamazing
-        run: mkdir -p out
 
       - name: Render video
         working-directory: remotion-iamazing
@@ -47,4 +33,3 @@ jobs:
         with:
           name: iamazing-school-mp4
           path: remotion-iamazing/out/iamazing-school.mp4
-          if-no-files-found: error
