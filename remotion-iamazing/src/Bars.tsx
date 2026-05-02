@@ -1,93 +1,99 @@
-import {useMemo} from 'react';
+import React from 'react';
 import {interpolate, useCurrentFrame} from 'remotion';
 
-type BarData = {
-  xStart: number;
-  yStart: number;
-  wavePhase: number;
-  waveSpeed: number;
-  amplitude: number;
-  height: number;
-  width: number;
-  hue: number;
-  targetX: number;
-  targetY: number;
+const WIDTH = 1920;
+const HEIGHT = 1080;
+const TOTAL_BARS = 620;
+
+const TEXT = 'Iamazing School';
+
+const textPattern = [
+  'IIII   aaa   m   m   aaa   zzzzz  iii  n   n   gggg      SSSS   cccc  h   h   ooo   ooo   l    ',
+  '  I   a   a  mm mm  a   a     z    iii  nn  n  g          S      c     h   h  o   o o   o  l    ',
+  '  I   aaaaa  m m m  aaaaa    z     iii  n n n  g ggg      SSSS   c     hhhhh  o   o o   o  l    ',
+  '  I   a   a  m   m  a   a   z      iii  n  nn  g   g         S   c     h   h  o   o o   o  l    ',
+  'IIII  a   a  m   m  a   a  zzzzz   iii  n   n   gggg      SSSS   cccc  h   h   ooo   ooo   llll ',
+];
+
+const generateTextTargets = () => {
+  const points: Array<{x: number; y: number}> = [];
+
+  const cell = 14;
+  const patternWidth = textPattern[0].length * cell;
+  const patternHeight = textPattern.length * cell;
+
+  const startX = WIDTH / 2 - patternWidth / 2;
+  const startY = HEIGHT / 2 - patternHeight / 2;
+
+  textPattern.forEach((row, rowIndex) => {
+    [...row].forEach((char, colIndex) => {
+      if (char !== ' ') {
+        points.push({
+          x: startX + colIndex * cell,
+          y: startY + rowIndex * cell,
+        });
+      }
+    });
+  });
+
+  return points;
 };
 
-const BAR_COUNT = 260;
-const LETTER_GRID_COLUMNS = 52;
-const LETTER_GRID_ROWS = 5;
-const VIEW_W = 1920;
-const VIEW_H = 1080;
+const targets = generateTextTargets();
 
-const seeded = (seed: number) => {
-  const x = Math.sin(seed * 999.91) * 10000;
-  return x - Math.floor(x);
+const getStartPosition = (index: number) => {
+  const angle = index * 2.399963;
+  const radius = 140 + (index % 31) * 17;
+
+  return {
+    x: WIDTH / 2 + Math.cos(angle) * radius,
+    y: HEIGHT / 2 + Math.sin(angle) * radius,
+  };
 };
 
 export const Bars: React.FC = () => {
   const frame = useCurrentFrame();
 
-  const bars = useMemo<BarData[]>(() => {
-    const textAreaWidth = 1260;
-    const textAreaHeight = 260;
-    const startX = (VIEW_W - textAreaWidth) / 2;
-    const startY = (VIEW_H - textAreaHeight) / 2;
-
-    return new Array(BAR_COUNT).fill(0).map((_, i) => {
-      const col = i % LETTER_GRID_COLUMNS;
-      const row = Math.floor(i / LETTER_GRID_COLUMNS) % LETTER_GRID_ROWS;
-      const targetX = startX + (col / (LETTER_GRID_COLUMNS - 1)) * textAreaWidth;
-      const targetY = startY + (row / (LETTER_GRID_ROWS - 1)) * textAreaHeight;
-
-      return {
-        xStart: seeded(i + 1) * VIEW_W,
-        yStart: seeded(i + 100) * VIEW_H,
-        wavePhase: seeded(i + 200) * Math.PI * 2,
-        waveSpeed: 0.045 + seeded(i + 300) * 0.02,
-        amplitude: 28 + seeded(i + 400) * 52,
-        height: 22 + seeded(i + 500) * 62,
-        width: 4 + seeded(i + 600) * 2,
-        hue: 220 + seeded(i + 700) * 60,
-        targetX,
-        targetY,
-      };
-    });
-  }, []);
-
-  const alignProgress = interpolate(frame, [210, 450, 600], [0, 0.7, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const motionDamping = interpolate(frame, [420, 600], [1, 0.12], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-
   return (
-    <div style={{position: 'absolute', inset: 0}}>
-      {bars.map((bar, i) => {
-        const wave = Math.sin(frame * bar.waveSpeed + bar.wavePhase) * bar.amplitude * motionDamping;
-        const x = bar.xStart + (bar.targetX - bar.xStart) * alignProgress;
-        const y = bar.yStart + (bar.targetY - bar.yStart) * alignProgress + wave;
+    <>
+      {Array.from({length: TOTAL_BARS}).map((_, index) => {
+        const start = getStartPosition(index);
+        const target = targets[index % targets.length];
+
+        const progress = interpolate(frame, [180, 520], [0, 1], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+
+        const wave = Math.sin(frame * 0.06 + index * 0.35) * 42 * (1 - progress);
+
+        const x = start.x + (target.x - start.x) * progress;
+        const y = start.y + (target.y - start.y) * progress + wave;
+
+        const height = interpolate(progress, [0, 1], [34, 16], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+
+        const hue = (index * 11 + frame * 0.4) % 360;
 
         return (
           <div
-            key={i}
+            key={index}
             style={{
               position: 'absolute',
               left: x,
               top: y,
-              width: bar.width,
-              height: bar.height,
+              width: 5,
+              height,
               borderRadius: 999,
-              backgroundColor: `hsl(${bar.hue}, 55%, 56%)`,
-              opacity: 0.9,
-              transform: 'translate(-50%, -50%)',
+              backgroundColor: `hsl(${hue}, 90%, 55%)`,
+              transform: `translate(-50%, -50%) rotate(${progress * 90}deg)`,
+              opacity: 0.96,
             }}
           />
         );
       })}
-    </div>
+    </>
   );
 };
