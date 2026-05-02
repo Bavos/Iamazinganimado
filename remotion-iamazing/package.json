@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "start": "remotion studio src/index.tsx",
-    "build": "remotion render src/index.tsx IamazingSchool out/iamazing-school.mp4"
+    "render": "remotion render src/index.tsx IamazingSchool out/iamazing-school.mp4",
+    "build": "npm run render"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.315",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "remotion": "^4.0.315",
+    "remotion": "^4.0.315"
+  },
+  "devDependencies": {
     "typescript": "^5.8.3"
   }
 }

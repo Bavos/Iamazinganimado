@@ -1,0 +1,36 @@
+name: Remotion Render
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: remotion-iamazing
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: remotion-iamazing/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Render video
+        run: npm run render
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iamazing-school-video
+          path: remotion-iamazing/out/iamazing-school.mp4
